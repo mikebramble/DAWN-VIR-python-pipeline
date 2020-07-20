@@ -1,8 +1,10 @@
 #!/bin.bash
 #Code written by: Mike Bramble | michael.s.bramble@jpl.nasa.gov
+#First written on 20 JUL 2020
 #Last edited on 20 JUL 2020
 #This script will make a list of all DAWN VIR PDS QUB files in a directory and then process the files using ISIS and generate ISIS image cubes, photometry cubes, and label files.
 #This script was written using ISIS4.
+#Note line 21 needs to be changed depending on whether VIS or IR detector images are being processed.
 
 #If the script errors out due to filename errors, check the housekeeping TAB or LBL files. There are occasional inconsistencies with the filenames of these files and whether the "_1" comes before or after the "HK" at the end of the file name.
 
