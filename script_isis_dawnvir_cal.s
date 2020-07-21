@@ -1,12 +1,14 @@
 #!/bin.bash
 #Code written by: Mike Bramble | michael.s.bramble@jpl.nasa.gov
+#This ISIS pipeline was taken from the document "Using ISIS to read VIR cubes into ISIS" by Eric E. Palmer accessed from the PDS via DAWNVIR_ISIS_TUTORIAL.pdf.
 #First written on 20 JUL 2020
-#Last edited on 20 JUL 2020
+#Last edited on 21 JUL 2020
 #This script will make a list of all DAWN VIR PDS QUB files in a directory and then process the files using ISIS and generate ISIS image cubes, photometry cubes, and label files.
 #This script was written using ISIS4.
-#Note line 21 needs to be changed depending on whether VIS or IR detector images are being processed.
+#Note 1: line 23 needs to be changed depending on whether VIS or IR detector images are being processed.
+#Note 2: a user-specified shape model for Ceres is applied in the spiceinit step. Make sure you either have a shape model downloaded and pointed to, or make sure you remove the shape and model pointers in the spiceinit step.
 
-#If the script errors out due to filename errors, check the housekeeping TAB or LBL files. There are occasional inconsistencies with the filenames of these files and whether the "_1" comes before or after the "HK" at the end of the file name.
+#If the script errors out due to filename errors, check the housekeeping TAB or LBL files. There are occasional inconsistencies with the filenames of these files and whether the "_1" comes before or after the "HK" at the end of the file name. If so, edit the dawnvir2isis command to account for the different position of "_1" in the filename.
 
 #make list
 file_list=`ls *_1.QUB`
@@ -15,7 +17,7 @@ file_list=`ls *_1.QUB`
 for i in $file_list
 do
 
-	# make new list of only first few characters
+	# iteratively step through each file in the list using the first 21 or 22 characters of the filename as the root name. Characters are collected using the cut command.
 	# for IR detector take first 21 characters
 	# for VIS detector take first 22 characters
 	rootname=`echo $i | cut -c-21`
@@ -33,7 +35,7 @@ do
 	#spiceinit
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
 	echo Attaching spice information
-	spiceinit from=${rootname}_1_vir2isis.cub ckpredicted=true
+	spiceinit from=${rootname}_1_vir2isis.cub ckpredicted=true shape=user model=/Users/bramble/Documents/DAWN_VIR/dawn_ceres_grv_icq1024_v2.bds
 
 	#catlab
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,6 +52,14 @@ do
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
 done
 
-#USE ISIS CUBE (.cub) FOR ANALYSIS IN PYTHON/GDAL/RASTERIO
-#USE ISIS photometry cube (_phocube.cub) FOR ANALYSIS IN PYTHON/GDAL/RASTERIO
+#Rename the print.prt file to save image processing steps for posterity.
 
+todaysdate=`date +"%Y%m%d%H%M"`
+mv print.prt ./dawnvir_files_processed_${todaysdate}.txt
+#rm print.prt
+
+echo - - - - - - - - - - - - - - - - - - - - - - - -
+echo Completed processing of DAWN VIR image cubes
+echo - - - - - - - - - - - - - - - - - - - - - - - -
+
+#Use ISIS cube (_vir2isis.cub) and photometry cube (_phocube.cub) for analysis in PYTHON/GDAL/RASTERIO
