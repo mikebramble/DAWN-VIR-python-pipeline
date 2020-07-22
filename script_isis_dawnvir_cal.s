@@ -2,10 +2,10 @@
 #Code written by: Mike Bramble | michael.s.bramble@jpl.nasa.gov
 #This ISIS pipeline was taken from the document "Using ISIS to read VIR cubes into ISIS" by Eric E. Palmer accessed from the PDS via DAWNVIR_ISIS_TUTORIAL.pdf.
 #First written on 20 JUL 2020
-#Last edited on 21 JUL 2020
+#Last edited on 22 JUL 2020
 #This script will make a list of all DAWN VIR PDS QUB files in a directory and then process the files using ISIS and generate ISIS image cubes, photometry cubes, and label files.
 #This script was written using ISIS4.
-#Note 1: line 23 needs to be changed depending on whether VIS or IR detector images are being processed.
+#Note 1: the rootname variable below needs to be changed depending on whether VIS or IR detector images are being processed.
 #Note 2: a user-specified shape model for Ceres is applied in the spiceinit step. Make sure you either have a shape model downloaded and pointed to, or make sure you remove the shape and model pointers in the spiceinit step.
 
 #If the script errors out due to filename errors, check the housekeeping TAB or LBL files. There are occasional inconsistencies with the filenames of these files and whether the "_1" comes before or after the "HK" at the end of the file name. If so, edit the dawnvir2isis command to account for the different position of "_1" in the filename.
@@ -44,7 +44,7 @@ do
 
 	#phocube
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
-	echo Generating photometry file
+	echo Generating photometry image cube
 	phocube from=${rootname}_1_vir2isis.cub+35 to=${rootname}_1_vir2isis_phocube.cub emission=no incidence=no localemission=yes localincidence=yes
 	
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
