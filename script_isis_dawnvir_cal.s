@@ -2,8 +2,9 @@
 #Code written by: Mike Bramble | michael.s.bramble@jpl.nasa.gov
 #This ISIS pipeline was taken from the document "Using ISIS to read VIR cubes into ISIS" by Eric E. Palmer accessed from the PDS via DAWNVIR_ISIS_TUTORIAL.pdf.
 #First written on 20 JUL 2020
-#Last edited on 22 JUL 2020
-#This script will make a list of all DAWN VIR PDS QUB files in a directory and then process the files using ISIS and generate ISIS image cubes, photometry cubes, and label files.
+#Last edited on 10 SEP 2020
+#Previous version edited on 23 JUL 2020
+#This script will make a list of all DAWN VIR PDS QUB files in a directory and then process the files using ISIS and generate ISIS image cubes, photometry cubes, and label files. Do not include the QQ QUB and LBL files in the directory of the images being processed if level 1B data are being processed.
 #This script was written using ISIS4.
 #Note 1: the rootname variable below needs to be changed depending on whether VIS or IR detector images are being processed.
 #Note 2: a user-specified shape model for Ceres is applied in the spiceinit step. Make sure you either have a shape model downloaded and pointed to, or make sure you remove the shape and model pointers in the spiceinit step.
@@ -20,7 +21,7 @@ do
 	# iteratively step through each file in the list using the first 21 or 22 characters of the filename as the root name. Characters are collected using the cut command.
 	# for IR detector take first 21 characters
 	# for VIS detector take first 22 characters
-	rootname=`echo $i | cut -c-21`
+	rootname=`echo $i | cut -c-22`
 	
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
 	echo Current file being processed: $i
@@ -29,7 +30,7 @@ do
 
 	#dawnvir2isis
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
-	echo Converting to ISIS
+	echo Converting to ISIS image cube
 	dawnvir2isis from=${rootname}_1.LBL image=${rootname}_1.QUB hkfrom=${rootname}_HK_1.LBL hktable=${rootname}_HK_1.TAB to=${rootname}_1_vir2isis.cub
 
 	#spiceinit
@@ -46,6 +47,11 @@ do
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
 	echo Generating photometry image cube
 	phocube from=${rootname}_1_vir2isis.cub+35 to=${rootname}_1_vir2isis_phocube.cub emission=no incidence=no localemission=yes localincidence=yes
+	
+	#isis2pds
+	#optional step to also produce PDS/IMG versions of the photometric image cubes
+	#uncomment this following line if you wish to apply its functions
+	#isis2pds from=${rootname}_1_vir2isis_phocube.cub to=${rootname}_1_vir2isis_phocube_isis2pds.img
 	
 	echo - - - - - - - - - - - - - - - - - - - - - - - -
 	echo Completed processing of ${rootname}
